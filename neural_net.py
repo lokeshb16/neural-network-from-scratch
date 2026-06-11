@@ -98,7 +98,7 @@ def compute_accuracy(A2, y):
 
 
 # ─────────────────────────────────────────
-# 6. BACKWARD PASS ← NEW ✨
+# 6. BACKWARD PASS
 # ─────────────────────────────────────────
 def backward_pass(cache, params, y):
     m = y.shape[0]
@@ -107,20 +107,20 @@ def backward_pass(cache, params, y):
     X       = cache["X"]
     W2      = params["W2"]
 
-    # Output layer ka error
+    # Compute output layer error (categorical cross-entropy derivative)
     dZ2 = A2.copy()
-    dZ2[np.arange(m), y] -= 1       # correct class se 1 minus karo
+    dZ2[np.arange(m), y] -= 1
     dZ2 /= m
 
-    # Layer 2 gradients
+    # Calculate Layer 2 gradients
     dW2 = A1.T @ dZ2
     db2 = np.sum(dZ2, axis=0, keepdims=True)
 
-    # Hidden layer ka error (backward propagate)
+    # Compute hidden layer error (backward propagation)
     dA1 = dZ2 @ W2.T
     dZ1 = dA1 * relu_derivative(Z1)
 
-    # Layer 1 gradients
+    # Calculate Layer 1 gradients
     dW1 = X.T @ dZ1
     db1 = np.sum(dZ1, axis=0, keepdims=True)
 
@@ -128,7 +128,7 @@ def backward_pass(cache, params, y):
 
 
 # ─────────────────────────────────────────
-# 7. WEIGHTS UPDATE ← NEW ✨
+# 7. WEIGHTS UPDATE
 # ─────────────────────────────────────────
 def update_weights(params, grads, lr=0.1):
     params["W1"] -= lr * grads["dW1"]
@@ -139,7 +139,7 @@ def update_weights(params, grads, lr=0.1):
 
 
 # ─────────────────────────────────────────
-# 8. TRAINING LOOP ← NEW ✨
+# 8. TRAINING LOOP
 # ─────────────────────────────────────────
 def train(X_train, y_train, X_test, y_test,
           epochs=20, batch_size=256, lr=0.1):
@@ -152,12 +152,12 @@ def train(X_train, y_train, X_test, y_test,
     print("-" * 42)
 
     for epoch in range(1, epochs + 1):
-        # Shuffle karo har epoch mein
+        # Shuffle dataset at the beginning of each epoch
         indices = np.random.permutation(X_train.shape[0])
         X_shuffled = X_train[indices]
         y_shuffled = y_train[indices]
 
-        # Mini-batch training
+        # Mini-batch training execution
         for i in range(0, X_train.shape[0], batch_size):
             X_batch = X_shuffled[i:i + batch_size]
             y_batch = y_shuffled[i:i + batch_size]
@@ -166,7 +166,7 @@ def train(X_train, y_train, X_test, y_test,
             grads = backward_pass(cache, params, y_batch)
             params = update_weights(params, grads, lr)
 
-        # Epoch end mein metrics calculate karo
+        # Evaluate performance metrics at the end of each epoch
         A2_train, _ = forward_pass(X_train, params)
         A2_test,  _ = forward_pass(X_test,  params)
 
@@ -194,7 +194,7 @@ if __name__ == "__main__":
     X_train, y_train, X_test, y_test = load_mnist()
     params, history = train(X_train, y_train, X_test, y_test)
 
-    # Results save karo (Step 4 mein use honge)
+    # Serialize results for evaluation scripts
     np.save("data/params.npy", params)
     np.save("data/history.npy", history)
     print("\n💾 Model saved to data/params.npy")
